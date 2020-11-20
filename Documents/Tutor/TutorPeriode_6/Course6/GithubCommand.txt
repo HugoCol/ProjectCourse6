@@ -1,0 +1,14 @@
+git commands
+
+// repo starten
+
+// ReadMe.md maken
+
+cat > ReadMe.md
+Nu kan je text in het bestand typen adhv html/Markdown code
+ctrl+d om te sluiten
+
+git init [repo_naam]
+
+git add [file]
+
