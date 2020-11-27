@@ -5,10 +5,10 @@ setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 require(edgeR)
 
 # Bestand RNA-seq data inlezen.
-inhoud = read.table("./WCFS1_cnts.txt", header=TRUE)
+inhoud = read.table("./RNAseq-bestanden/RNA-Seq-counts.txt", header=TRUE)
 row.names(inhoud) = inhoud[,"ID"]
 # Annotatiedata toevoegen.
-annotatiebestand = "./WCFS1_anno.txt"
+annotatiebestand = "./RNAseq-bestanden/WCFS1_anno.txt"
 annotatie = read.table(annotatiebestand, header=TRUE, sep="\t"
                   , quote="")
 names(annotatie)[names(annotatie) == "name"] = "ID"
