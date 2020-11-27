@@ -16,9 +16,9 @@ data = merge(inhoud, annotatie, by="ID")
 
 # Data omzetten naar DGEList.
 groep = factor(c("WCFS1.glc.1",	"WCFS1.glc.2",	"WCFS1.rib.1"
-                 ,	"WCFS1.rib.2"))
-specialeLijst = DGEList(counts=data[,2:5], group=groep)
-
+                 , "WCFS1.rib.2", "NC8.glc.1", "NC8.glc.2"	
+                 , "NC8.rib.1", "NC8.rib.2"))
+specialeLijst = DGEList(counts=data[,2:9], group=groep)
 # Met edgeR de data normaliseren (edgeRUsersGuide()
 # voor gebruiksaanwijzing).
 x = calcNormFactors(specialeLijst, method="TMM")
