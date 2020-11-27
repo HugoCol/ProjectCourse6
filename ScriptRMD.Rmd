@@ -1,0 +1,112 @@
+---
+title: "Project B2 RMD"
+output: html_document
+---
+```{r}
+library(edgeR)
+```
+### read counts
+```{r}
+fDir <-  file.choose()
+```
+### fName <- "WCFS1_cnts.txt"
+
+### "WCFS1_cnts.txt"
+### "WCFS1_RNA-Seq.txt"
+```{r}
+cnts <- read.delim(paste0(fDir), comment.char = "#") ### ,fName), comment.char="#")
+```
+
+### used for topTags identification
+```{r}
+row.names(cnts) <- cnts[,"ID"]
+```
+
+### Create DGEList
+```{r}
+exp <- c("WCFS1.glc","WCFS1.glc","WCFS1.rib","WCFS1.rib")
+
+group <- factor(exp)
+y <- DGEList(counts=cnts[,2:5],group=group)
+````
+### Normalise counts
+### Trimmed mean of M values : remove lowest and highest values
+### (percentile) and calculate mean
+```{r}
+y <- calcNormFactors(y, method="TMM" )
+```
+### Check statistics
+```{r}
+print("Count statistics")
+print(summary(y$counts))
+print(y$samples)
+```
+### Create design matrix
+```{r}
+design <- model.matrix(~0+group, data=y$samples)
+colnames(design) <- levels(y$samples$group)
+print(design)
+```
+### Estimate Dispersion
+
+#y <- estimateDisp(y, design)
+```{r}
+y <- estimateGLMCommonDisp(y,design)
+y <- estimateGLMTrendedDisp(y,design, method="power")
+y <- estimateGLMTagwiseDisp(y,design)
+```
+### Plot results
+```{r}
+pdf(paste0(fDir,"test.pdf"))
+plotMDS(y)
+plotBCV(y)
+dev.off()
+```
+### Fit data
+```{r}
+fit <- glmFit(y,design)
+```
+### Determine fold changes
+```{r}
+mc <- makeContrasts(exp.r=WCFS1.glc-WCFS1.rib, levels=design)
+
+fit <- glmLRT(fit, contrast=mc)
+```
+### Print top tags
+```{r}
+res<-topTags(fit)
+print(res)
+```
+### Correlatie van de data
+```{r}
+cor.test(y$counts[,1], y$counts[,2])
+cor.test(y$counts[,3], y$counts[,4])
+```
+### plot van diviance en dispersion
+```{r}
+plot(deviance(fit))
+plot(fit$dispersion)
+```
+### Alle p-values
+```{r}
+PV <- fit[["table"]][["PValue"]]
+head(PV, 100)
+```
+### Alle fold changes in log
+```{r}
+logFC <- fit[["table"]][["logFC"]]
+head(logFC, 100)
+```
+### Alle fold changes normaal
+```{r}
+FC <- logFC^2
+head(FC, 100)
+```
+###
+```{r}
+summary(de <- decideTestsDGE(fit))
+
+detags <- rownames(y)[as.logical(de)]
+plotSmear(fit, de.tags = detags)
+abline(h=c(-1,1), col="blue")
+```
