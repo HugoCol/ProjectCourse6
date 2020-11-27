@@ -102,7 +102,7 @@ head(logFC, 100)
 FC <- logFC^2
 head(FC, 100)
 ```
-###
+### Test ding
 ```{r}
 summary(de <- decideTestsDGE(fit))
 
