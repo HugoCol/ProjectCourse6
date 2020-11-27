@@ -2,7 +2,7 @@
 title: "Project B2 RMD"
 output: html_document
 ---
-```{r}
+```{r include = FALSE}
 library(edgeR)
 ```
 ### read counts
