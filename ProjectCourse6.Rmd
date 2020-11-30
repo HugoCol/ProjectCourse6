@@ -1,13 +1,39 @@
 ---
-title: "Project B2 RMD"
+title: "ProjectCourse6"
 output: html_document
 ---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+Dit is een R Markdown document voor het project van course 6 gemaakt door groep 1. blablabla
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+
 ```{r include = FALSE}
 library(edgeR)
+require(limma)
+```
+### Huidige werkmap instellen naar map waar script in staat. 
+```{r}
+#setwd(dirname(rstudioapi::getSourceEditorContext()$path)) 
+fDir <-  file.choose()
 ```
 ### read counts
 ```{r}
-fDir <-  file.choose()
+
+inhoud = read.table("./RNAseq-bestanden/RNA-Seq-counts.txt", header=TRUE)
+#row.names(inhoud) = inhoud[,"ID"]
+annotatie = read.table(annotatiebestand, header=TRUE, sep="\t"
+                  , quote="")
+names(annotatie)[names(annotatie) == "name"] = "ID"
+data = merge(inhoud, annotatie, by="ID")
+#fDir <-  read.table("./WCFS1_cnts.txt", header=TRUE) 
+#row.names(inhoud) = inhoud[,"ID"]
 ```
 ### fName <- "WCFS1_cnts.txt"
 
@@ -24,16 +50,21 @@ row.names(cnts) <- cnts[,"ID"]
 
 ### Create DGEList
 ```{r}
-exp <- c("WCFS1.glc","WCFS1.glc","WCFS1.rib","WCFS1.rib")
+#exp <- c("WCFS1.glc","WCFS1.glc","WCFS1.rib","WCFS1.rib")
 
-group <- factor(exp)
-y <- DGEList(counts=cnts[,2:5],group=group)
+group <- factor(c("WCFS1.glc.1",	"WCFS1.glc.2",	"WCFS1.rib.1"
+                 , "WCFS1.rib.2", "NC8.glc.1", "NC8.glc.2"	
+                 , "NC8.rib.1", "NC8.rib.2"))
+y <- DGEList(counts=data[,2:9], group=group)
 ```
 ### Normalise counts
 ### Trimmed mean of M values : remove lowest and highest values
 ### (percentile) and calculate mean
 ```{r}
 y <- calcNormFactors(y, method="TMM" )
+keep <- filterByExpr(y)
+x <- y[keep, , keep.lib.sizes=FALSE]
+x$samples$lib.size = colSums(x$counts)
 ```
 ### Check statistics
 ```{r}
@@ -49,11 +80,23 @@ print(design)
 ```
 ### Estimate Dispersion
 
+Ik weet niet zeker wat hier de goede methode is. 
+y <- estimateGLMCommonDisp(y,design)
+y <- estimateGLMTrendedDisp(y,design, method="power")
+y <- estimateGLMTagwiseDisp(y,design)
+is uit het voorbeeld.
+Philip heeft genoemd dat:
+
 #y <- estimateDisp(y, design)
+
+beter is
 ```{r}
 y <- estimateGLMCommonDisp(y,design)
 y <- estimateGLMTrendedDisp(y,design, method="power")
 y <- estimateGLMTagwiseDisp(y,design)
+
+#y <- estimateDisp(y, design)
+
 ```
 ### Plot results
 ```{r}
