@@ -110,6 +110,7 @@ dev.off()
 fit <- glmFit(y,design)
 ```
 ### Determine fold changes
+<<<<<<< HEAD
 
 # Hier maak je een dataframe met de informatie die je wilt vergelijken 
 df=data.frame(group=rep(c("A","B"),5), value1=1:10,value2=21:30,value3=41:50,stringsAsFactors = F)
@@ -121,6 +122,8 @@ res["fc",]=c("A.vs.B",as.numeric(res[1,-1])/as.numeric(res[2,-1]))
 res
 
 
+=======
+>>>>>>> cc13b86d0e1a0e92be9a1a6a09f5817292c32973
 ```{r}
 mc <- makeContrasts(exp.r=WCFS1.glc-WCFS1.rib, levels=design)
 
@@ -164,6 +167,7 @@ detags <- rownames(y)[as.logical(de)]
 plotSmear(fit, de.tags = detags)
 abline(h=c(-1,1), col="blue")
 ```
+<<<<<<< HEAD
 # welke genen zijn interessant om te kiezen adhv hun Fold Change? 
 # Een histogram maken endan kijken hoe het utpakt 
 
@@ -182,3 +186,5 @@ abline(h=c(-1,1), col="blue")
 
 # wanneer is dit hierarchisch?
 # Je kan dit hierarchisch maken door de samples die het meest op elkaar lijken te koppelen en dan een soort fylogenetisch boom te maken.  
+=======
+>>>>>>> cc13b86d0e1a0e92be9a1a6a09f5817292c32973
