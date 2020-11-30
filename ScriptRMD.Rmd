@@ -28,7 +28,7 @@ exp <- c("WCFS1.glc","WCFS1.glc","WCFS1.rib","WCFS1.rib")
 
 group <- factor(exp)
 y <- DGEList(counts=cnts[,2:5],group=group)
-````
+```
 ### Normalise counts
 ### Trimmed mean of M values : remove lowest and highest values
 ### (percentile) and calculate mean
