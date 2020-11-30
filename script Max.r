@@ -32,10 +32,11 @@ x$samples$lib.size = colSums(x$counts)
 
 # Dispersie berekenen
 
-#matrix = model.matrix(~0+group, data=x$samples)
-#colnames(matrix) = levels(x$samples$group)
-#dispersie = estimateDisp(x, matrix)
-#matrix
+matrix = model.matrix(~0+group, data=x$samples)
+colnames(matrix) = levels(x$samples$group)
+dispersie = estimateDisp(x, matrix)
+matrix
+dispersie
 
 summary(x$counts)
 plotMDS(x)

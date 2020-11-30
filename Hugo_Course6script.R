@@ -40,8 +40,6 @@ matrix
 summary(x$counts) 
 plotMDS(x)
 
-log2(6)
-5/6
 
 # Hier maak je een dataframe met de informatie die je wilt vergelijken 
 df=data.frame(group=rep(c("A","B"),5), value1=1:10,value2=21:30,value3=41:50,stringsAsFactors = F)
