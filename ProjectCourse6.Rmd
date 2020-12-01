@@ -17,6 +17,10 @@ When you click the **Knit** button a document will be generated that includes bo
 ```{r include = FALSE}
 library(edgeR)
 require(limma)
+library(stats)
+library(dplyr)
+library(ggplot2)
+library(ggfortify)
 ```
 ### Huidige werkmap instellen naar map waar script in staat. 
 ```{r}
@@ -117,11 +121,32 @@ print(res)
 ```
 ### Correlatie van de data
 ```{r}
-cor.test(y$counts[,1], y$counts[,2])
-cor.test(y$counts[,3], y$counts[,4])
+cor.test(x$counts[,1], x$counts[,2])
+cor.test(x$counts[,3], x$counts[,4])
 ```
 ### Alle p-values
 ```{r}
 PV <- fit[["table"]][["PValue"]]
 head(PV, 100)
+```
+
+```{r}
+wssplot <- function(data, nc=15, seed=1234)
+{
+  wss <- (nrow(data)-1)*sum(apply(data, 2,var))
+  for (i in 2:nc){
+    set.seed(seed)
+    wss[i] <- sum(kmeans(data, centers=i)$withinss)}
+  plot(1:nc, wss, type='b', xlab = "number of clusters", 
+       ylab = "within groups sum of squares")
+}
+
+mydata = select(data, c(2,3,4,5,6,7,8,9))
+wssplot(mydata)
+```
+
+###K-means berekenen.
+```{r}
+KM = kmeans(mydata, 4)
+autoplot(KM, mydata, frame=TRUE)
 ```
