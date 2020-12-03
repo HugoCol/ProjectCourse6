@@ -2,3 +2,7 @@
 .Rhistory
 .RData
 .Ruserdata
+ProjectCourse6.Rmd
+*.html
+*.pdf
+*.Rproj
