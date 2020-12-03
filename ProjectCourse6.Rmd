@@ -24,8 +24,7 @@ library(ggfortify)
 ```
 ### Huidige werkmap instellen naar map waar script in staat. 
 ```{r}
-setwd(dirname(rstudioapi::getSourceEditorContext()$path)) 
-#fDir <-  file.choose()
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 ```
 ### read counts
 ```{r}
