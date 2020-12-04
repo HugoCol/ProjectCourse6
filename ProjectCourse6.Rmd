@@ -1,5 +1,5 @@
 ---
-title: "ProjectCourse"
+title: "ProjectCourse6"
 output: html_document
 editor_options: 
   chunk_output_type: console
