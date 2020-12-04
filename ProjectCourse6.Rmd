@@ -98,14 +98,17 @@ fit <- glmFit(x,design)
 ### Dit nog uitwerken, zie issue #4
 ```{r}
 # Hier maak je een dataframe met de informatie die je wilt vergelijken 
-#df=data.frame(group=rep(c("A","B"),5), #value1=1:10,value2=21:30,value3=41:50,stringsAsFactors = F)
-#df
+
+df=data.frame(group=rep(c("A","B"),5), value1=1:10,value2=21:30,value3=41:50,stringsAsFactors = F)
+df
+
 # hallo github
 #df=data.frame(group=rep(c("A","B"),5), value1=1:10,value2=21:30,value3=41:50,stringsAsFactors = F)
 #df
-# Dit is de code om een Fold Change te berekening uit de limma package 
+
+# Dit is de code om een Fold Change te berekening uit de limma package
 #res=aggregate(.~group,df,mean) 
-#res["fc",]=c("A.vs.B",as.numeric(res[1,-1])/as.numeric(res[2,-1])) 
+#res["fc",]=c("A.vs.B",as.numeric(res[1,-1])/as.numeric(res[2,-1]))
 #res
 ```
 
@@ -146,6 +149,8 @@ mydata = select(data, c(2,3,4,5,6,7,8,9))
 wssplot(mydata)
 ```
 
+
+
 ###K-means berekenen.
 ```{r}
 KM = kmeans(mydata, 4)
@@ -157,10 +162,24 @@ autoplot(KM, mydata, frame=TRUE)
 aggregate(mydata,by=list(KM$cluster),FUN=mean)
 # append cluster assignment
 mydata <- data.frame(mydata, KM$cluster)
-
+mydata
 ```
 ```{r}
 #install.packages('dendextend')
+```
+
+### testje met Foldchange
+```{r}
+
+df=data.frame(group=rep(c("A","B"),5), value1=1:10,value2=21:30,value3=41:50,stringsAsFactors = F)
+df
+
+
+res=aggregate(.~group,mydata,mean) 
+res["fc",]=c("glc.vs.rib",as.numeric(res[1,-1])/as.numeric(res[2,-1]))
+res
+
+
 ```
 
 ###Hierachisch clusteren
