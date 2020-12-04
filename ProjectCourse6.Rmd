@@ -1,6 +1,8 @@
 ---
-title: "ProjectCourse"
+title: "ProjectCourse6"
 output: html_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -25,8 +27,7 @@ library(dendextend)
 ```
 ### Huidige werkmap instellen naar map waar script in staat. 
 ```{r}
-setwd(dirname(rstudioapi::getSourceEditorContext()$path)) 
-#fDir <-  file.choose()
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 ```
 ### read counts
 ```{r}
@@ -97,8 +98,14 @@ fit <- glmFit(x,design)
 ### Dit nog uitwerken, zie issue #4
 ```{r}
 # Hier maak je een dataframe met de informatie die je wilt vergelijken 
+<<<<<<< HEAD
 df=data.frame(group=rep(c("A","B"),5), value1=1:10,value2=21:30,value3=41:50,stringsAsFactors = F)
 df
+=======
+# hallo github
+#df=data.frame(group=rep(c("A","B"),5), value1=1:10,value2=21:30,value3=41:50,stringsAsFactors = F)
+#df
+>>>>>>> e0b8d43b0672e39af547a7ccb05b91cbba4f1330
 # Dit is de code om een Fold Change te berekening uit de limma package 
 #res=aggregate(.~group,df,mean) 
 #res["fc",]=c("A.vs.B",as.numeric(res[1,-1])/as.numeric(res[2,-1])) 
