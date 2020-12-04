@@ -101,6 +101,7 @@ fit <- glmFit(x,design)
 ### Dit nog uitwerken, zie issue #4
 ```{r}
 # Hier maak je een dataframe met de informatie die je wilt vergelijken 
+# hallo github
 #df=data.frame(group=rep(c("A","B"),5), value1=1:10,value2=21:30,value3=41:50,stringsAsFactors = F)
 #df
 # Dit is de code om een Fold Change te berekening uit de limma package 
