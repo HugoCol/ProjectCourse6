@@ -82,10 +82,8 @@ x <- estimateGLMTagwiseDisp(x,design)
 
 ### Plot results
 ```{r}
-pdf(paste0("test.pdf"))
 plotMDS(x)
 plotBCV(x)
-dev.off()
 ```
 
 ### Fit data
@@ -162,7 +160,7 @@ autoplot(KM, mydata, frame=TRUE)
 aggregate(mydata,by=list(KM$cluster),FUN=mean)
 # append cluster assignment
 mydata <- data.frame(mydata, KM$cluster)
-mydata
+#mydata
 ```
 ```{r}
 #install.packages('dendextend')
@@ -171,13 +169,13 @@ mydata
 ### testje met Foldchange
 ```{r}
 
-df=data.frame(group=rep(c("A","B"),5), value1=1:10,value2=21:30,value3=41:50,stringsAsFactors = F)
-df
+#df=data.frame(group=rep(c("A","B"),5), value1=1:10,value2=21:30,value3=41:50,stringsAsFactors = F)
+#df
 
 
-res=aggregate(.~group,mydata,mean) 
-res["fc",]=c("glc.vs.rib",as.numeric(res[1,-1])/as.numeric(res[2,-1]))
-res
+#res=aggregate(.~group,mydata,mean) 
+#res["fc",]=c("glc.vs.rib",as.numeric(res[1,-1])/as.numeric(res[2,-1]))
+#res
 
 
 ```
@@ -190,6 +188,6 @@ dend %>% set("labels", c("WCFS1.glc.2", "NC8.glc.1", "NC8.rib.2", "WCFS1.rib.1",
 ```
 
 ```{r}
-View(data)
-?hclust
+#View(data)
+#?hclust
 ```
