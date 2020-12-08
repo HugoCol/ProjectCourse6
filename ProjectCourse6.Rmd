@@ -17,21 +17,19 @@ When you click the **Knit** button a document will be generated that includes bo
 
 
 ```{r include = FALSE}
-library(edgeR)
+require(edgeR)
 require(limma)
-library(stats)
-library(dplyr)
-library(ggplot2)
-library(ggfortify)
-library(dendextend)
-library(gtools)
+require(stats)
+require(dplyr)
+require(ggplot2)
+require(ggfortify)
+require(dendextend)
+require(gtools)
 ```
-### Huidige werkmap instellen naar map waar script in staat. 
-```{r}
+
+```{r include = FALSE}
+# Data RNA-seq inlezen en annotatie eraan koppelen. 
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
-```
-### read counts
-```{r}
 
 inhoud = read.table("./RNAseq-bestanden/RNA-Seq-counts.txt", header=TRUE)
 row.names(inhoud) = inhoud[,"ID"]
@@ -39,53 +37,48 @@ annotatie = read.table("./RNAseq-bestanden/WCFS1_anno.txt", header=TRUE, sep="\t
                   , quote="")
 names(annotatie)[names(annotatie) == "name"] = "ID"
 data = merge(inhoud, annotatie, by="ID")
-```
-
-### Create DGEList
-```{r}
-#exp <- c("WCFS1.glc","WCFS1.glc","WCFS1.rib","WCFS1.rib")
 
 group <- factor(c("WCFS1.glc",	"WCFS1.glc",	"WCFS1.rib"
                  , "WCFS1.rib", "NC8.glc", "NC8.glc"	
                  , "NC8.rib", "NC8.rib"))
 x <- DGEList(counts=data[,2:9], group=group)
-```
 
-### Normalise counts
-### Trimmed mean of M values : remove lowest and highest values
-### (percentile) and calculate mean
-```{r}
+# Normalisatiefactoren berekenen en low-read-counts wegfilteren,
+# nodig voor normalisatie en dispersie.
 x <- calcNormFactors(x, method="TMM" )
 keep <- filterByExpr(x)
 x <- x[keep, , keep.lib.sizes=FALSE]
 x$samples$lib.size = colSums(x$counts)
-```
 
-### Check statistics
-```{r}
-#print("Count statistics")
-#print(summary(x$counts))
-#print(x$samples)
-```
-
-### Create design matrix
-```{r}
+# Design matrix maken, nodig voor dispersie bepalen.
 design <- model.matrix(~0+group, data=x$samples)
 colnames(design) <- levels(x$samples$group)
-```
 
-### Estimate Dispersion
-```{r}
+# Dispersie bepalen.
 x <- estimateGLMCommonDisp(x,design)
 x <- estimateGLMTrendedDisp(x,design, method="power")
 x <- estimateGLMTagwiseDisp(x,design)
 ```
 
-### Plot results
+###Overzicht laten zien.
 ```{r}
+print("Count statistics")
+print(summary(x$counts))
+print(x$samples)
 plotMDS(x)
 plotBCV(x)
 ```
+
+
+
+
+
+
+
+
+
+
+
 
 ### Fit data
 ```{r}
