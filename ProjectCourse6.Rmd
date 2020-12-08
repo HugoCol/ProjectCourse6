@@ -24,6 +24,7 @@ library(dplyr)
 library(ggplot2)
 library(ggfortify)
 library(dendextend)
+library(gtools)
 ```
 ### Huidige werkmap instellen naar map waar script in staat. 
 ```{r}
@@ -93,25 +94,6 @@ dev.off()
 fit <- glmFit(x,design)
 ```
 
-# Code hieronder nog bijwerken/opschonen.
-
-### Dit nog uitwerken, zie issue #4
-```{r}
-# Hier maak je een dataframe met de informatie die je wilt vergelijken 
-
-df=data.frame(group=rep(c("A","B"),5), value1=1:10,value2=21:30,value3=41:50,stringsAsFactors = F)
-df
-
-# hallo github
-#df=data.frame(group=rep(c("A","B"),5), value1=1:10,value2=21:30,value3=41:50,stringsAsFactors = F)
-#df
-
-# Dit is de code om een Fold Change te berekening uit de limma package
-#res=aggregate(.~group,df,mean) 
-#res["fc",]=c("A.vs.B",as.numeric(res[1,-1])/as.numeric(res[2,-1]))
-#res
-```
-
 ### P-waarde berekenen
 ```{r}
 mc <- makeContrasts(exp.r=WCFS1.glc-WCFS1.rib, levels=design)
@@ -171,13 +153,48 @@ mydata
 ### testje met Foldchange
 ```{r}
 
-df=data.frame(group=rep(c("A","B"),5), value1=1:10,value2=21:30,value3=41:50,stringsAsFactors = F)
-df
+#df=data.frame(group=rep(c("A","B"),5), value1=1:10,value2=21:30,value3=41:50,stringsAsFactors = F)
+#df
 
+mydata
+# Deze berekining is goed!!
+meanWCFSglu <- rowMeans(mydata[,1:2])
+meanWCFSglu
 
-res=aggregate(.~group,mydata,mean) 
-res["fc",]=c("glc.vs.rib",as.numeric(res[1,-1])/as.numeric(res[2,-1]))
-res
+meanWCFSrib <-rowMeans(mydata[,3:4])
+meanWCFSrib
+
+meanNC8glu <-rowMeans(mydata[,5:6])
+meanNC8glu
+
+meanNC8rib <-rowMeans(mydata[,7:8])
+meanNC8rib
+# vergelijk hier de gemiddelden van de experimenten met elkaar
+# vergelijk dus WCFS.glc met WCFS.rib
+
+# bereken de foldchange tussen twee kolommen
+WCFSfc <- foldchange(meanWCFSglu , meanWCFSrib )
+NC8fc <- foldchange(meanNC8glu , meanNC8rib )
+
+my_list <- list(WCFSfc, NC8fc)
+my_list
+
+as.data.frame(do.call(cbind, my_list))
+#maak de FC Log2
+WCFSfc
+NC8fc
+
+WCFSfclog <- foldchange2logratio(WCFSfc, base=2)
+WCFSfclog
+
+NC8fclog <- foldchange2logratio(NC8fc, base=2)
+NC8fclog
+
+my_list2 <- list(WCFSfclog, NC8fclog)
+my_list2
+
+as.data.frame(do.call(cbind, my_list2))
+
 
 
 ```
