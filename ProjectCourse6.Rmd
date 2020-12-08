@@ -194,16 +194,26 @@ my_list2 <- list(WCFSfclog, NC8fclog)
 my_list2
 
 as.data.frame(do.call(cbind, my_list2))
-
-
-
 ```
 
 ###Hierachisch clusteren
 ```{r}
-dend <- mydata[1:8,] %>% scale %>%
-  dist %>% hclust %>% as.dendrogram
-dend %>% set("labels", c("WCFS1.glc.2", "NC8.glc.1", "NC8.rib.2", "WCFS1.rib.1", "WCFS1.rib.2", "NC8.rib.1", "WCFS1.glc.1", "NC8.glc.1")) %>% plot
+# code Karsten
+c_data = t(x$counts)
+dist = dist(c_data, method = "euclidean")
+# Het clustogram wordt gevormd en geplot
+hclust = hclust(dist)
+plot(hclust)
+
+#code karsten
+
+
+
+#dend <- mydata[1:8,] %>% scale %>%
+  #dist %>% hclust %>% as.dendrogram
+#dend %>% set("labels", c("WCFS1.glc.2", "NC8.glc.1", "NC8.rib.2", "WCFS1.rib.1", "WCFS1.rib.2", "NC8.rib.1", "WCFS1.glc.1", "NC8.glc.1")) %>% plot
+
+#dend %>% set("labels", c("WCFS1.glc.1", "WCFS.glc.2", "WCFS.rib.1", "WCFS1.rib.2", "NC8.glu.1", "NC8.glu.2", "NC8.rib.1", "NC8.rib.2")) %>% plot
 ```
 
 ```{r}
