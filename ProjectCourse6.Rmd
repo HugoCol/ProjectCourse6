@@ -25,7 +25,7 @@ library(dendextend)
 ```
 ### Huidige werkmap instellen naar map waar script in staat. 
 ```{r}
-setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+#setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 ```
 ### read counts
 ```{r}
@@ -80,10 +80,10 @@ x <- estimateGLMTagwiseDisp(x,design)
 
 ### Plot results
 ```{r}
-pdf(paste0("test.pdf"))
 plotMDS(x)
+```
+```{r}
 plotBCV(x)
-dev.off()
 ```
 
 ### Fit data
@@ -97,6 +97,7 @@ fit <- glmFit(x,design)
 ```{r}
 # Hier maak je een dataframe met de informatie die je wilt vergelijken 
 #<<<<<<< HEAD
+#<<<<<<< HEAD
 df=data.frame(group=rep(c("A","B"),5), value1=1:10,value2=21:30,value3=41:50,stringsAsFactors = F)
 df
 #=======
@@ -104,6 +105,13 @@ df
 #df=data.frame(group=rep(c("A","B"),5), value1=1:10,value2=21:30,value3=41:50,stringsAsFactors = F)
 #df
 #>>>>>>> e0b8d43b0672e39af547a7ccb05b91cbba4f1330
+#=======
+#df=data.frame(group=rep(c("A","B"),5), #value1=1:10,value2=21:30,value3=41:50,stringsAsFactors = F)
+#df
+# hallo github
+#df=data.frame(group=rep(c("A","B"),5), value1=1:10,value2=21:30,value3=41:50,stringsAsFactors = F)
+#df
+#>>>>>>> f228996f38eab90efb44e50d99c4bfc359e31d83
 # Dit is de code om een Fold Change te berekening uit de limma package 
 #res=aggregate(.~group,df,mean) 
 #res["fc",]=c("A.vs.B",as.numeric(res[1,-1])/as.numeric(res[2,-1])) 
@@ -168,10 +176,20 @@ mydata <- data.frame(mydata, KM$cluster)
 ```{r}
 dend <- mydata[1:8,] %>% scale %>%
   dist %>% hclust %>% as.dendrogram
-dend %>% set("labels", c("WCFS1.glc.2", "NC8.glc.1", "NC8.rib.2", "WCFS1.rib.1", "WCFS1.rib.2", "NC8.rib.1", "WCFS1.glc.1", "NC8.glc.1")) %>% plot
+dend 
+plot(dend )# %>% set("labels", c("WCFS1.glc.2", "NC8.glc.1", "NC8.rib.2", "WCFS1.rib.1", "WCFS1.rib.2", "NC8.rib.1", "WCFS1.glc.1", "NC8.glc.1")) %>% plot
 ```
 
 ```{r}
-#View(data)
-#?hclust
+norm_1 <-as.data.frame(t(y$counts))
+norm_labels = names(norm_1)
+names(norm_1) <- NULL
+
+
+
+norm_sc = as.data.frame(scale(norm_1))
+d <- dist(norm_sc, method='euclidean')
+hc1 = hclust(d, method = 'complete')
+#plot(hc1, cex=0.6, hang=-1)
+ggdendrogram(hc1)
 ```
