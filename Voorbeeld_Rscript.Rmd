@@ -1,0 +1,244 @@
+---
+output:
+  html_document: default
+  pdf_document: default
+---
+
+Laden van libraries
+```{r}
+library(edgeR)
+library(xlsx)
+library(rtracklayer)
+library(KEGGREST)
+library(pathview)
+library(RCurl)
+```
+
+Inladen van de bestanden, verwijderen lege kolommen en samenvoegen in 1 tabel
+```{r}
+RNA_Seq_count = read.delim("RNA-Seq-counts.txt", header=TRUE, skip = 1, row.names = 1)
+annotation = read.delim("WCFS1_anno.txt", header=TRUE, skip = 1, row.names = 1)
+
+drops <- c("X","X.1","X.2","X.3")
+annotation <- annotation[ , !(names(annotation) %in% drops)]
+```
+
+NOrmaliseren van de data
+```{r}
+exp_NC8 <- c("NC8.glc","NC8.glc","NC8.rib","NC8.rib")
+group_NC8 <- factor(exp_NC8)
+NC8_data <- DGEList(counts = RNA_Seq_count[,5:8], group = group_NC8)
+
+exp_WCFS1 <- c("WCFS1.glc","WCFS1.glc","WCFS1.rib","WCFS1.rib")
+group_WCFS1 <- factor(exp_WCFS1)
+WCFS1_data <- DGEList(counts = RNA_Seq_count[,1:4], group = group_WCFS1)
+
+print(NC8_data)
+print(WCFS1_data)
+```
+
+Filter data, minstens 15 counts per miljoen (cpm) in 2 samples
+```{r}
+keep.genes_WCFS1 <- rowSums(cpm(WCFS1_data)>15) >= 2
+WCFS1_data <- WCFS1_data[keep.genes_WCFS1, ]
+
+keep.genes_NC8 <- rowSums(cpm(NC8_data)>15) >= 2
+NC8_data <- NC8_data[keep.genes_NC8, ]
+
+print(WCFS1_data)
+print(NC8_data)
+```
+
+Berekenen van de normalisatie factoren adhv TMM
+```{r}
+WCFS1_data <- calcNormFactors(WCFS1_data, method = "TMM")
+
+NC8_data <- calcNormFactors(NC8_data, method = "TMM")
+```
+
+Maken van een design matrix
+```{r}
+design_NC8 <- model.matrix(~0+group, data = NC8_data$samples)
+colnames(design_NC8) <- levels(NC8_data$samples$group)
+
+design_WCFS1 <- model.matrix(~0+group, data = WCFS1_data$samples)
+colnames(design_WCFS1) <- levels(WCFS1_data$samples$group)
+```
+
+Berekenen dispersie op 3 verschillende manieren: Common, Trended en Tagwise
+```{r}
+WCFS1_data2 <- estimateGLMCommonDisp(WCFS1_data, design_WCFS1)
+WCFS1_data2 <- estimateGLMTrendedDisp(WCFS1_data2, design_WCFS1, method = "power")
+WCFS1_data2 <- estimateGLMTagwiseDisp(WCFS1_data2, design_WCFS1)
+
+NC8_data2 <- estimateGLMCommonDisp(NC8_data, design_NC8)
+NC8_data2 <- estimateGLMTrendedDisp(NC8_data2, design_NC8, method = "power")
+NC8_data2 <- estimateGLMTagwiseDisp(NC8_data2, design_NC8)
+
+print(WCFS1_data2)
+```
+
+Plotten genormaliseerde data
+```{r}
+plotMDS(NC8_data2)
+plotMeanVar(NC8_data2)
+plotBCV(NC8_data2)
+
+plotMDS(WCFS1_data2)
+plotMeanVar(WCFS1_data2)
+plotBCV(WCFS1_data2)
+```
+
+Fitten van een model
+```{r}
+fit_WCFS1 <- glmFit(WCFS1_data2, design_WCFS1)
+mc_WCFS1 <- makeContrasts((WCFS1.rib-WCFS1.glc), levels=design_WCFS1)
+fit_WCFS1 <- glmLRT(fit_WCFS1, contrast=mc_WCFS1)
+res_WCFS1 <- topTags(fit_WCFS1, n=nrow(WCFS1_data2), sort.by = "logFC")
+res_WCFS1_top <- topTags(fit_WCFS1)
+print(res_WCFS1_top)
+
+fit_NC8 <- glmFit(NC8_data2, design_NC8)
+mc_NC8 <- makeContrasts((NC8.rib-NC8.glc), levels=design_NC8)
+fit_NC8 <- glmLRT(fit_NC8, contrast=mc_NC8)
+res_NC8 <- topTags(fit_NC8, n=nrow(NC8_data2), sort.by = "logFC")
+res_NC8_top <- topTags(fit_NC8)
+print(res_NC8_top)
+```
+
+The total number of differentially expressed genes at FDR<0.05, down-, niet significant of up-gereguleerd
+```{r}
+de_WCFS1 <- decideTestsDGE(fit_WCFS1, adjust.method = "BH", p.value = 0.05)
+summary(de_WCFS1)
+
+de_NC8 <- decideTestsDGE(fit_NC8, adjust.method = "BH", p.value = 0.05)
+summary(de_NC8)
+```
+
+Filter genen met logFC > 2 & < -2 & FDR < 0.05
+```{r}
+
+sig_up_WCFS1 <- res_WCFS1$table[(res_WCFS1$table$FDR<0.05 & res_WCFS1$table$logFC > 2), ]
+sig_down_WCFS1 <- res_WCFS1$table[(res_WCFS1$table$FDR<0.05 & res_WCFS1$table$logFC < -2), ]
+
+WCFS1_sig <- rbind(sig_up_WCFS1, sig_down_WCFS1)
+
+sig_up_NC8 <- res_NC8$table[(res_NC8$table$FDR<0.05 & res_NC8$table$logFC > 2), ]
+sig_down_NC8 <- res_NC8$table[(res_NC8$table$FDR<0.05 & res_NC8$table$logFC < -2), ]
+
+NC8_sig <- rbind(sig_up_NC8, sig_down_NC8)
+```
+
+Annoteren van de up-gereguleerde genen adhv Tilman's bestand
+```{r}
+WCFS1_sig <- cbind(sig_up_WCFS1, annotation[rownames(sig_up_WCFS1),])
+NC8_sig <- cbind(sig_up_NC8, annotation[rownames(sig_up_NC8),])
+print(head(WCFS1_sig))
+```
+
+Openen van gff bestand
+```{r}
+gff <- import.gff3("L_plantarum_genomic.gff")
+print(gff)
+```
+
+Opslaan van data in bestanden
+```{r}
+write.xlsx(WCFS1_sig, file = "Gen expressie Lacto. plantarum.xlsx", sheetName = "WCFS1 significant", append = T)
+write.xlsx(NC8_sig, file = "Gen expressie Lacto. plantarum.xlsx", sheetName = "NC8 significant", append = T)
+```
+
+Ophalen van pathway's van KEGG
+```{r}
+pathways <- keggLink("pathway", "T00115")
+pathways <- strsplit(pathways, '\t')
+
+getPathwayDesc <- function(pathwayname){
+  url <- paste('http://togows.dbcls.jp/entry/pathway/', pathwayname, '/name', sep="")
+  description <- getURL(url)
+  return(description)
+}
+
+alleData <- rbind(WCFS1_sig, NC8_sig)
+
+alleData <- data.frame(rownames(alleData))
+colnames(alleData) <- c('ids')
+for(p in 1:24){
+  alleData[[paste(p, sep="")]] <- NA
+}
+
+#fill data frame
+for(g in 1:length(alleData$ids)){
+  current_gene <- alleData$ids[g]
+  indexes <- which(grepl(current_gene, names(pathways)))
+  if(!length(indexes)==0){
+    for(x in 1:length(indexes)){
+        indexpathwaycode <- x+x
+        indexdesc <- x+x+1
+        pathwayname <- pathways[indexes[x]]
+        alleData[g,indexpathwaycode] <- pathwayname
+        alleData[g,indexdesc] <- getPathwayDesc(pathwayname)
+    }
+  }
+}
+write.xlsx(x = alleData, file = "genen_pathway.xlsx", showNA=FALSE)
+getwd()
+```
+
+Maken van een ranked bestand voor de GSEA
+```{r}
+rnk_NC8 <- res_NC8
+rnk_WCFS1 <- res_WCFS1
+
+rnk_NC8$table$fcSign <- sign(rnk_NC8$table$logFC)
+rnk_NC8$table$logP <- -log10(rnk_NC8$table$PValue)
+rnk_NC8$table$metric <- rnk_NC8$table$logP/rnk_NC8$table$fcSign
+rnk_NC8$table$
+s <- rnk_NC8[,c("metric")]
+write.table(s, file="NC8_expression.rnk", quote=F, sep="\t", row.names = F)
+
+rnk_WCFS1$table$fcSign <- sign(rnk_WCFS1$table$logFC)
+rnk_WCFS1$table$logP <- -log10(rnk_WCFS1$table$PValue)
+rnk_WCFS1$table$metric <- rnk_WCFS1$table$logP/rnk_WCFS1$table$fcSign
+s <- rnk_WCFS1[,c("Name","metric")]
+write.table(s, file="WCFS1_expression.rnk", quote=F, sep="\t", row.names = F)
+
+```
+
+Maken van een gene set voor de GSEA
+```{r}
+subclass <- as.character(unique(annotation$subclass))
+subclass <- subclass[!(duplicated(tolower(subclass)))]
+subclass <- subclass[subclass != ""]
+
+max_row = 0
+dataf <- data.frame(All=row.names(annotation))
+for (index in 1:length(subclass)) {
+  temp_set <- subset(annotation, annotation$subclass==subclass[index])['subclass']
+  genes <- c(NA, row.names(temp_set))
+  dataf$col <- c(genes, rep('', nrow(dataf)-length(genes)))
+  names(dataf)[index+1] = subclass[index]
+  if(nrow(temp_set) > max_row){
+    max_row = nrow(temp_set)
+  }
+}
+dataf <- subset(dataf, select = -c(All))
+dataf <- dataf[-c(max_row+2:nrow(dataf)), ]
+write.table(dataf, file="gene_sets.gmx", row.names = F, sep="\t", quote = F)
+```
+
+Visualiseren van genen in de Glycolyse pathway van de significante WCFS1 genen
+```{r}
+mypathway <- "lpl00010"
+genes <- row.names(WCFS1_sig)
+logFC <- WCFS1_sig$logFC
+names(logFC) <- genes
+pathview(gene.data = logFC, species = "lpl", pathway = mypathway,  gene.idtype = "KEGG")
+
+```
+
+
+
+
+
+
