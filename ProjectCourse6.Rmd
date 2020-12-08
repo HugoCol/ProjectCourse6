@@ -10,13 +10,10 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## R Markdown
+Dit is een R Markdown document voor het project van course 6 gemaakt door groep 1. blablabla (╯°□°）╯︵ ┻━┻
+ 
 
-Dit is een R Markdown document voor het project van course 6 gemaakt door groep 1. blablabla
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-
-```{r include = FALSE}
+```{r packagesLaden, include = FALSE}
 require(edgeR)
 require(limma)
 require(stats)
@@ -60,11 +57,17 @@ x <- estimateGLMTrendedDisp(x,design, method="power")
 x <- estimateGLMTagwiseDisp(x,design)
 ```
 
-###Overzicht laten zien.
-```{r}
-print("Count statistics")
+### Samenvatting van genormaliseerde data
+Overzicht van alle counts:
+```{r samenvattingCounts, echo=FALSE}
 print(summary(x$counts))
+```
+Overzicht van de verschillende groepen:
+```{r samplesPrinten, echo=FALSE}
 print(x$samples)
+```
+### Plots van genormaliseerde data
+```{r plotsWeergeven, echo=FALSE}
 plotMDS(x)
 plotBCV(x)
 ```
@@ -146,8 +149,6 @@ mydata <- data.frame(mydata, KM$cluster)
 
 #df=data.frame(group=rep(c("A","B"),5), value1=1:10,value2=21:30,value3=41:50,stringsAsFactors = F)
 #df
-<<<<<<< HEAD
-=======
 
 mydata
 # Deze berekining is goed!!
@@ -171,21 +172,17 @@ NC8fc <- foldchange(meanNC8glu , meanNC8rib )
 
 my_list <- list(WCFSfc, NC8fc)
 my_list
->>>>>>> ec4f3e1871fe9be69577eb31a1264b6a00051e5c
 
 as.data.frame(do.call(cbind, my_list))
 #maak de FC Log2
 WCFSfc
 NC8fc
 
-<<<<<<< HEAD
 #res=aggregate(.~group,mydata,mean) 
 #res["fc",]=c("glc.vs.rib",as.numeric(res[1,-1])/as.numeric(res[2,-1]))
 #res
-=======
 WCFSfclog <- foldchange2logratio(WCFSfc, base=2)
 WCFSfclog
->>>>>>> ec4f3e1871fe9be69577eb31a1264b6a00051e5c
 
 NC8fclog <- foldchange2logratio(NC8fc, base=2)
 NC8fclog
