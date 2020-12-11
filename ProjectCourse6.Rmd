@@ -20,6 +20,7 @@ require(ggfortify)
 require(dendextend)
 require(gtools)
 ```
+
 ```{r include = FALSE}
 # Data RNA-seq inlezen en annotatie eraan koppelen. 
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
