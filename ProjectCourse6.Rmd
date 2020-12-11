@@ -84,13 +84,19 @@ x <- estimateGLMTagwiseDisp(x,design)
 
 ### Plot results
 ```{r}
+<<<<<<< HEAD
 #pdf(paste0("test.pdf"))
+=======
+>>>>>>> ed2601102043b39e87445cc71fcc75dffbdf9ad6
 plotMDS(x)
 ```
 
 ```{r}
 plotBCV(x)
+<<<<<<< HEAD
 #dev.off()
+=======
+>>>>>>> ed2601102043b39e87445cc71fcc75dffbdf9ad6
 ```
 
 ### Fit data
@@ -149,12 +155,20 @@ autoplot(KM, mydata, frame=TRUE)
 aggregate(mydata,by=list(KM$cluster),FUN=mean)
 # append cluster assignment
 mydata <- data.frame(mydata, KM$cluster)
-mydata
+#mydata
 ```
 
 ### FoldChange
 ```{r}
 
+<<<<<<< HEAD
+=======
+#df=data.frame(group=rep(c("A","B"),5), value1=1:10,value2=21:30,value3=41:50,stringsAsFactors = F)
+#df
+<<<<<<< HEAD
+=======
+
+>>>>>>> ed2601102043b39e87445cc71fcc75dffbdf9ad6
 mydata
 # Deze berekining is goed!!
 meanWCFSglu <- rowMeans(mydata[,1:2])
@@ -172,6 +186,7 @@ NC8fc <- foldchange(meanNC8glu , meanNC8rib )
 
 my_list <- list(WCFSfc, NC8fc)
 my_list
+>>>>>>> ec4f3e1871fe9be69577eb31a1264b6a00051e5c
 
 FoldchangeFrame <- data.frame(do.call(cbind, my_list))
 FoldchangeFrame
@@ -179,8 +194,14 @@ FoldchangeFrame
 WCFSfc
 NC8fc
 
+<<<<<<< HEAD
+#res=aggregate(.~group,mydata,mean) 
+#res["fc",]=c("glc.vs.rib",as.numeric(res[1,-1])/as.numeric(res[2,-1]))
+#res
+=======
 WCFSfclog <- foldchange2logratio(WCFSfc, base=2)
 WCFSfclog
+>>>>>>> ec4f3e1871fe9be69577eb31a1264b6a00051e5c
 
 NC8fclog <- foldchange2logratio(NC8fc, base=2)
 NC8fclog
@@ -212,6 +233,6 @@ plot(hclust)
 ```
 
 ```{r}
-View(data)
-?hclust
+#View(data)
+#?hclust
 ```
