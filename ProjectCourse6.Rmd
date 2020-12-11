@@ -8,7 +8,8 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## R Markdown
-Dit is een R Markdown document voor het project van course 6 gemaakt door groep 1. blablabla (╯°□°）╯︵ ┻━┻
+Dit is een R Markdown document voor het project van course 6 gemaakt door 
+groep 1. blablabla (╯°□°）╯︵ ┻━┻
 
 ```{r packagesLaden, include = FALSE}
 require(edgeR)
@@ -139,37 +140,30 @@ mydata <- data.frame(mydata, KM$cluster)
 ```
 
 ### FoldChange
+Er is nu een dataframe me de fold changes,
+uit de mydata moeten die genen met FC tussen 1 en -1 verwijderd worden
+en de foldchanges die blijven in een kolom toegevoegd worden
 ```{r}
 
-<<<<<<< HEAD
-=======
-#df=data.frame(group=rep(c("A","B"),5), value1=1:10,value2=21:30,value3=41:50,stringsAsFactors = F)
-#df
-<<<<<<< HEAD
-=======
-
->>>>>>> ed2601102043b39e87445cc71fcc75dffbdf9ad6
 mydata
-# Deze berekining is goed!!
+# Bereken het gemiddelde
 meanWCFSglu <- rowMeans(mydata[,1:2])
 meanWCFSrib <-rowMeans(mydata[,3:4])
 meanNC8glu <-rowMeans(mydata[,5:6])
 meanNC8rib <-rowMeans(mydata[,7:8])
->>>>>>> 1aca34a9a4d1f1a7e3061220664a0e41982cf4c3
-# vergelijk hier de gemiddelden van de experimenten met elkaar
-# vergelijk dus WCFS.glc met WCFS.rib
 
-# bereken de foldchange tussen twee kolommen
+# bereken de foldchange tussen glu en rib
 WCFSfc <- foldchange(meanWCFSglu , meanWCFSrib )
 test <- table[(WCFSfc > 2)]
 test
 NC8fc <- foldchange(meanNC8glu , meanNC8rib )
 
-my_list <- list(WCFSfc, NC8fc)
+# hoe doe je nu he filteren? Di geef booleans
+my_list <- list(WCFSfc > 2, NC8fc > 2)
 
 FoldchangeFrame <- data.frame(do.call(cbind, my_list))
 FoldchangeFrame
-#maak de FC Log2
+#maak de FC Log2, code nog niet goed
 
 WCFSfclog <- foldchange2logratio(WCFSfc, base=2)
 
