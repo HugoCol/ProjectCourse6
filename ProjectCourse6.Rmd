@@ -9,9 +9,12 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## R Markdown
 
-Dit is een R Markdown document voor het project van course 6 gemaakt door groep 1. blablabla
+Dit is een R Markdown document voor het project van course 6 
+gemaakt door groep 1.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+When you click the **Knit** button a document will be generated that includes 
+both content as well as the output of any embedded R code chunks within the 
+document. You can embed an R code chunk like this:
 
 
 ```{r include = FALSE}
@@ -29,6 +32,7 @@ library(gtools)
 #setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 ```
 ### read counts
+Hier wordt alle data ingelezen en de annotaties toegevoegd in een tabel
 ```{r}
 # Leest het RNA-Seq bestand in en voegt het annotatie bestand er aan toe
 inhoud = read.table("./RNAseq-bestanden/RNA-Seq-counts.txt", header=TRUE)
@@ -40,6 +44,7 @@ data = merge(inhoud, annotatie, by="ID")
 ```
 
 ### Create DGEList
+Hier word een DGE list gemaakt. Een DGElist is een object van een tabel met counts
 ```{r}
 # Maakt een groep aan met de bijbehoorende namen
 group <- factor(c("WCFS1.glc",	"WCFS1.glc",	"WCFS1.rib"
@@ -51,13 +56,19 @@ x <- DGEList(counts=data[,2:9], group=group)
 ### Normalise counts
 ### Trimmed mean of M values : remove lowest and highest values
 ### (percentile) and calculate mean
+
+## Dit klopt! de Cutoff is dat er minimaal in twee kolommen 15 reads of meer moeten zitten
 ```{r}
 x <- calcNormFactors(x, method="TMM" )
 keep <- filterByExpr(x)
 x <- x[keep, , keep.lib.sizes=FALSE]
 x$samples$lib.size = colSums(x$counts)
+
+<<<<<<< HEAD
+=======
 ```
 
+>>>>>>> 1aca34a9a4d1f1a7e3061220664a0e41982cf4c3
 ### Create design matrix
 ```{r}
 design <- model.matrix(~0+group, data=x$samples)
@@ -73,15 +84,28 @@ x <- estimateGLMTagwiseDisp(x,design)
 
 ### Plot results
 ```{r}
+<<<<<<< HEAD
+#pdf(paste0("test.pdf"))
+=======
+>>>>>>> ed2601102043b39e87445cc71fcc75dffbdf9ad6
 plotMDS(x)
 ```
+<<<<<<< HEAD
+=======
+
+>>>>>>> 1aca34a9a4d1f1a7e3061220664a0e41982cf4c3
 ```{r}
 plotBCV(x)
+<<<<<<< HEAD
+#dev.off()
+=======
+>>>>>>> ed2601102043b39e87445cc71fcc75dffbdf9ad6
 ```
 
 ### Fit data
 ```{r}
 fit <- glmFit(x,design)
+fit$counts
 ```
 
 ### P-waarde berekenen
@@ -132,6 +156,7 @@ autoplot(KM, mydata, frame=TRUE)
 
 ### Foldchange berekeningen
 ```{r}
+<<<<<<< HEAD
 meanWCFSglu <- rowMeans(mydata[,1:2])
 
 meanWCFSrib <-rowMeans(mydata[,3:4])
@@ -140,16 +165,44 @@ meanNC8glu <-rowMeans(mydata[,5:6])
 
 meanNC8rib <-rowMeans(mydata[,7:8])
 
+=======
+aggregate(mydata,by=list(KM$cluster),FUN=mean)
+# append cluster assignment
+mydata <- data.frame(mydata, KM$cluster)
+#mydata
+```
+
+### FoldChange
+```{r}
+
+<<<<<<< HEAD
+=======
+#df=data.frame(group=rep(c("A","B"),5), value1=1:10,value2=21:30,value3=41:50,stringsAsFactors = F)
+#df
+<<<<<<< HEAD
+=======
+
+>>>>>>> ed2601102043b39e87445cc71fcc75dffbdf9ad6
+mydata
+# Deze berekining is goed!!
+meanWCFSglu <- rowMeans(mydata[,1:2])
+meanWCFSrib <-rowMeans(mydata[,3:4])
+meanNC8glu <-rowMeans(mydata[,5:6])
+meanNC8rib <-rowMeans(mydata[,7:8])
+>>>>>>> 1aca34a9a4d1f1a7e3061220664a0e41982cf4c3
 # vergelijk hier de gemiddelden van de experimenten met elkaar
 # vergelijk dus WCFS.glc met WCFS.rib
 
 # bereken de foldchange tussen twee kolommen
 WCFSfc <- foldchange(meanWCFSglu , meanWCFSrib )
+test <- table[(WCFSfc > 2)]
+test
 NC8fc <- foldchange(meanNC8glu , meanNC8rib )
 
 my_list <- list(WCFSfc, NC8fc)
 
-as.data.frame(do.call(cbind, my_list))
+FoldchangeFrame <- data.frame(do.call(cbind, my_list))
+FoldchangeFrame
 #maak de FC Log2
 
 WCFSfclog <- foldchange2logratio(WCFSfc, base=2)
