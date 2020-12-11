@@ -92,7 +92,7 @@ plotBCV(x)
 fit <- glmFit(x,design)
 ```
 
-<<<<<<< HEAD
+#<<<<<<< HEAD
 # Code hieronder nog bijwerken/opschonen.
 
 ### Dit nog uitwerken, zie issue #4
@@ -120,8 +120,8 @@ df
 #res
 ```
 
-=======
->>>>>>> ec4f3e1871fe9be69577eb31a1264b6a00051e5c
+#=======
+#>>>>>>> ec4f3e1871fe9be69577eb31a1264b6a00051e5c
 ### P-waarde berekenen
 ```{r}
 mc <- makeContrasts(exp.r=WCFS1.glc-WCFS1.rib, levels=design)
@@ -174,9 +174,6 @@ aggregate(mydata,by=list(KM$cluster),FUN=mean)
 mydata <- data.frame(mydata, KM$cluster)
 mydata
 ```
-```{r}
-#install.packages('dendextend')
-```
 
 ### testje met Foldchange
 ```{r}
@@ -226,41 +223,9 @@ as.data.frame(do.call(cbind, my_list2))
 
 ###Hierachisch clusteren
 ```{r}
-<<<<<<< HEAD
-dend <- mydata[1:8,] %>% scale %>%
-  dist %>% hclust %>% as.dendrogram
-dend 
-plot(dend )# %>% set("labels", c("WCFS1.glc.2", "NC8.glc.1", "NC8.rib.2", "WCFS1.rib.1", "WCFS1.rib.2", "NC8.rib.1", "WCFS1.glc.1", "NC8.glc.1")) %>% plot
-=======
-# code Karsten
 c_data = t(x$counts)
 dist = dist(c_data, method = "euclidean")
 # Het clustogram wordt gevormd en geplot
 hclust = hclust(dist)
 plot(hclust)
-
-#code karsten
-
-
-
-#dend <- mydata[1:8,] %>% scale %>%
-  #dist %>% hclust %>% as.dendrogram
-#dend %>% set("labels", c("WCFS1.glc.2", "NC8.glc.1", "NC8.rib.2", "WCFS1.rib.1", "WCFS1.rib.2", "NC8.rib.1", "WCFS1.glc.1", "NC8.glc.1")) %>% plot
-
-#dend %>% set("labels", c("WCFS1.glc.1", "WCFS.glc.2", "WCFS.rib.1", "WCFS1.rib.2", "NC8.glu.1", "NC8.glu.2", "NC8.rib.1", "NC8.rib.2")) %>% plot
->>>>>>> ec4f3e1871fe9be69577eb31a1264b6a00051e5c
-```
-
-```{r}
-norm_1 <-as.data.frame(t(y$counts))
-norm_labels = names(norm_1)
-names(norm_1) <- NULL
-
-
-
-norm_sc = as.data.frame(scale(norm_1))
-d <- dist(norm_sc, method='euclidean')
-hc1 = hclust(d, method = 'complete')
-#plot(hc1, cex=0.6, hang=-1)
-ggdendrogram(hc1)
 ```
