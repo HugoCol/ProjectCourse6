@@ -78,13 +78,28 @@ fit$counts
 
 ### P-waarde berekenen
 ```{r}
+# Hier is code om eerst een contrast te berekenen en
+# fold-changes te berekenen! EN de P-waardes berekenen!
 mc <- makeContrasts(exp.r=WCFS1.glc-WCFS1.rib, levels=design)
 fit <- glmLRT(fit, contrast=mc)
+fit$table
 ```
 ### Print top tags
 ```{r}
+# TopTags berekend ook de FDR.
 res<-topTags(fit)
 print(res)
+
+# Originele counts met log en annotatie koppelen.
+# Dan filteren op FDR alles lager dan 0.5.
+# Dan filteren op LogFC tussen -1 en 1.
+# sorteren op FDR.
+# In heatmap de counts weergeven van gefilterde data.
+# kijken hoeveel data na filteren.
+# Hoeveel naar ribose en hoeveel naar glucose? data bekijken.
+# Meer inzicht krijgen in wat wat doet en resultaten bekijken.
+# Focus op data en kijken wat ik zie, niet pakketten valideren.
+# KEGG-mapper kan gebruikt worden van docent.
 ```
 ### Correlatie van de data
 ```{r}
@@ -124,7 +139,7 @@ autoplot(KM, mydata, frame=TRUE)
 
 ### Cluster
 ```{r}
-a,by=list(KM$cluster),FUN=mean)
+#a,by=list((KM$cluster),FUN=mean)
 # append cluster assignment
 mydata <- data.frame(mydata, KM$cluster)
 #mydata
