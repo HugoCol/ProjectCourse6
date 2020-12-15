@@ -11,6 +11,9 @@ knitr::opts_chunk$set(echo = TRUE)
 Dit is een R Markdown document voor het project van course 6 gemaakt door 
 groep 1. blablabla (╯°□°）╯︵ ┻━┻
 
+Met een klein beetje CSS, in het HTML Markdown de kolommen verkorten
+
+
 ```{r packagesLaden, include = FALSE}
 require(edgeR)
 require(limma)
@@ -124,7 +127,7 @@ autoplot(KM, mydata, frame=TRUE)
 
 ### Cluster
 ```{r}
-a,by=list(KM$cluster),FUN=mean)
+#by=(list(KM$cluster)FUN=mean)
 # append cluster assignment
 mydata <- data.frame(mydata, KM$cluster)
 #mydata
@@ -135,7 +138,6 @@ Er is nu een dataframe me de fold changes,
 uit de mydata moeten die genen met FC tussen 1 en -1 verwijderd worden
 en de foldchanges die blijven in een kolom toegevoegd worden
 ```{r}
-
 mydata
 # Bereken het gemiddelde
 meanWCFSglu <- rowMeans(mydata[,1:2])
@@ -145,11 +147,11 @@ meanNC8rib <-rowMeans(mydata[,7:8])
 
 # bereken de foldchange tussen glu en rib
 WCFSfc <- foldchange(meanWCFSglu , meanWCFSrib )
-test <- table[(WCFSfc > 2)]
-test
+
 NC8fc <- foldchange(meanNC8glu , meanNC8rib )
 
 # hoe doe je nu he filteren? Di geef booleans
+
 my_list <- list(WCFSfc > 2, NC8fc > 2)
 
 FoldchangeFrame <- data.frame(do.call(cbind, my_list))
@@ -160,6 +162,7 @@ WCFSfclog <- foldchange2logratio(WCFSfc, base=2)
 
 NC8fclog <- foldchange2logratio(NC8fc, base=2)
 
+WCFS1_DEgenes <- subset(WCFSfclog, (logFC < -1 | logFC > 1))
 my_list2 <- list(WCFSfclog, NC8fclog)
 
 as.data.frame(do.call(cbind, my_list2))
