@@ -20,23 +20,21 @@ require(ggplot2)
 require(ggfortify)
 require(dendextend)
 require(gtools)
+require(knitr)
 ```
 
-```{r include = FALSE}
-# Data RNA-seq inlezen en annotatie eraan koppelen. 
+```{r include=FALSE}
+# Data RNA-seq inlezen. 
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 
 inhoud = read.table("./RNAseq-bestanden/RNA-Seq-counts.txt", header=TRUE)
 row.names(inhoud) = inhoud[,"ID"]
-annotatie = read.table("./RNAseq-bestanden/WCFS1_anno.txt", header=TRUE, sep="\t"
-                  , quote="")
-names(annotatie)[names(annotatie) == "name"] = "ID"
-data = merge(inhoud, annotatie, by="ID")
 
 group <- factor(c("WCFS1.glc",	"WCFS1.glc",	"WCFS1.rib"
                  , "WCFS1.rib", "NC8.glc", "NC8.glc"	
                  , "NC8.rib", "NC8.rib"))
-x <- DGEList(counts=data[,2:9], group=group)
+#x <- DGEList(counts=data[,2:9], group=group)
+x = DGEList(counts=inhoud[,2:9], group=group)
 
 # Normalisatiefactoren berekenen en low-read-counts wegfilteren,
 # nodig voor normalisatie en dispersie.
@@ -58,11 +56,11 @@ x <- estimateGLMTagwiseDisp(x,design)
 ### Samenvatting van genormaliseerde data
 Overzicht van alle counts:
 ```{r samenvattingCounts, echo=FALSE}
-print(summary(x$counts))
+kable(summary(x$counts))
 ```
 Overzicht van de verschillende groepen:
 ```{r samplesPrinten, echo=FALSE}
-print(x$samples)
+kable(x$samples)
 ```
 ### Plots van genormaliseerde data
 ```{r plotsWeergeven, echo=FALSE}
@@ -70,121 +68,88 @@ plotMDS(x)
 plotBCV(x)
 ```
 
-### Fit data
-```{r}
-fit <- glmFit(x,design)
-fit$counts
-```
-
-### P-waarde berekenen
-```{r}
-# Hier is code om eerst een contrast te berekenen en
-# fold-changes te berekenen! EN de P-waardes berekenen!
-mc <- makeContrasts(exp.r=WCFS1.glc-WCFS1.rib, levels=design)
-fit <- glmLRT(fit, contrast=mc)
-fit$table
-```
-### Print top tags
-```{r}
-# TopTags berekend ook de FDR.
-res<-topTags(fit)
-print(res)
-
-# Originele counts met log en annotatie koppelen.
-# Dan filteren op FDR alles lager dan 0.5.
-# Dan filteren op LogFC tussen -1 en 1.
-# sorteren op FDR.
-# In heatmap de counts weergeven van gefilterde data.
-# kijken hoeveel data na filteren.
-# Hoeveel naar ribose en hoeveel naar glucose? data bekijken.
-# Meer inzicht krijgen in wat wat doet en resultaten bekijken.
-# Focus op data en kijken wat ik zie, niet pakketten valideren.
-# KEGG-mapper kan gebruikt worden van docent.
-```
 ### Correlatie van de data
-```{r}
+Correlatie tussen WCFS1.glc 1 en 2:
+```{r, echo=FALSE}
 cor.test(x$counts[,1], x$counts[,2])
+```
+Correlatie tussen WCFS1.rib 3 en 4:
+```{r, echo=FALSE}
 cor.test(x$counts[,3], x$counts[,4])
 ```
-### Alle p-values
-```{r}
-PV <- fit[["table"]][["PValue"]]
-head(PV, 100)
+Correlatie tussen NC8.glc 1 en 2:
+```{r, echo=FALSE}
+cor.test(x$counts[,5], x$counts[,6])
 ```
-### Grafiek om het aantal clusters te laten zien
-```{r}
-# wordt gebruikt om het aantal cluster weer te geven dat je moet gebruiken voor de K-means
-wssplot <- function(data, nc=15, seed=1234)
-{
-  wss <- (nrow(data)-1)*sum(apply(data, 2,var))
-  for (i in 2:nc){
-    set.seed(seed)
-    wss[i] <- sum(kmeans(data, centers=i)$withinss)}
-  plot(1:nc, wss, type='b', xlab = "number of clusters", 
-       ylab = "within groups sum of squares")
-}
-# Bij de waarde waar hij overloopt tot een rechte lijn moet je gebruiken voor aantal clusters.
-# Dus met deze gegevens wordt een cluster van 4 gebruikt
-mydata = select(data, c(2,3,4,5,6,7,8,9))
-wssplot(mydata)
+Correlatie tussen NC8.rib 3 en 4:
+```{r, echo=FALSE}
+cor.test(x$counts[,7], x$counts[,8])
 ```
 
+```{r, include = FALSE}
+# LogFC, P-waarde en FDR berekenen en koppelen aan originele
+# data en annotatie toevoegen. Daarna data filteren op FDR<0.5
+# en logFC tussen -1 en 1. Tenslotte data filteren op FDR.
+fit <- glmFit(x, design)
+mc <- makeContrasts(WCFS1.glc-WCFS1.rib, NC8.glc-NC8.rib, levels=design)
+fit = glmLRT(fit, contrast=mc)
+waardes = topTags(fit, dim(fit)[1])$table
 
+# LogFC, P-waarde en FDR koppelen aan genormaliseerde en
+# gefilterde data uit DGE-lijst.
+combinatie = merge(x$counts, waardes, by=0)
+names(combinatie)[names(combinatie) == "Row.names"] = "ORF"
 
-### K-means berekenen.
-```{r}
-KM = kmeans(mydata, 4)
-autoplot(KM, mydata, frame=TRUE)
+# Annotatie inlezen en koppelen aan data.
+annotatie = read.table("./RNAseq-bestanden/WCFS1_anno.txt", header=TRUE
+                       , sep="\t", quote="")
+data = merge(combinatie, annotatie, by="ORF")
+
+# Data filteren en sorteren.
+data = subset(data, FDR < 0.05)
+data = subset(data, logFC.WCFS1.glc...WCFS1.rib >= -1)
+data = subset(data, logFC.WCFS1.glc...WCFS1.rib <= 1)
+data = subset(data, logFC.NC8.glc...NC8.rib >= -1)
+data = subset(data, logFC.NC8.glc...NC8.rib <= 1)
+data = data[order(data$FDR), ]
+counts = data[, 2:9]
 ```
 
-### Cluster
-```{r}
-#a,by=list((KM$cluster),FUN=mean)
-# append cluster assignment
-mydata <- data.frame(mydata, KM$cluster)
-#mydata
-```
+### Gegevens na filteren
+Gebruikte filters:
+  
+* FDR < 0.05
+* -1 < logFC < 1
+  
+Aantal genen na filteren: `r dim(data)[1]`
 
-### FoldChange
-Er is nu een dataframe me de fold changes,
-uit de mydata moeten die genen met FC tussen 1 en -1 verwijderd worden
-en de foldchanges die blijven in een kolom toegevoegd worden
-```{r}
-
-mydata
-# Bereken het gemiddelde
-meanWCFSglu <- rowMeans(mydata[,1:2])
-meanWCFSrib <-rowMeans(mydata[,3:4])
-meanNC8glu <-rowMeans(mydata[,5:6])
-meanNC8rib <-rowMeans(mydata[,7:8])
-
-# bereken de foldchange tussen glu en rib
-WCFSfc <- foldchange(meanWCFSglu , meanWCFSrib )
-test <- table[(WCFSfc > 2)]
-test
-NC8fc <- foldchange(meanNC8glu , meanNC8rib )
-
-# hoe doe je nu he filteren? Di geef booleans
-my_list <- list(WCFSfc > 2, NC8fc > 2)
-
-FoldchangeFrame <- data.frame(do.call(cbind, my_list))
-FoldchangeFrame
-#maak de FC Log2, code nog niet goed
-
-WCFSfclog <- foldchange2logratio(WCFSfc, base=2)
-
-NC8fclog <- foldchange2logratio(NC8fc, base=2)
-
-my_list2 <- list(WCFSfclog, NC8fclog)
-
-as.data.frame(do.call(cbind, my_list2))
-```
-
-### Hierachisch clusteren
-```{r}
-c_data = t(x$counts)
-dist = dist(c_data, method = "euclidean")
-# Het clustogram wordt gevormd en geplot
+### Dendrogram van data
+```{r, echo=FALSE}
+dist = dist(t(counts), method = "euclidean")
 hclust = hclust(dist)
 plot(hclust)
 ```
+
+### Heatmap van gefilterde en gesorteerde data
+```{r, echo=FALSE}
+heatmap(as.matrix(counts))
+```
+
+```{r, include=FALSE}
+# K-means berekenen en plotten. Plot fout?
+KM = kmeans(counts, 4)
+autoplot(KM, counts, frame=TRUE)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
