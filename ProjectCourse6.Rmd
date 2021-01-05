@@ -89,6 +89,14 @@ Correlatie tussen NC8.rib 3 en 4:
 cor.test(x$counts[,7], x$counts[,8])
 ```
 
+### Dendrogram van data
+```{r, echo=FALSE}
+dist = dist(t(x$counts), method = "euclidean")
+#dist = dist(t(counts), method = "euclidean")
+hclust = hclust(dist)
+plot(hclust)
+```
+
 ```{r, include = FALSE}
 # LogFC, P-waarde en FDR berekenen en koppelen aan originele
 # data en annotatie toevoegen. Daarna data filteren op FDR<0.5
@@ -125,13 +133,6 @@ Gebruikte filters:
 * -1 < logFC < 1
   
 Aantal genen na filteren: `r dim(data)[1]`
-
-### Dendrogram van data
-```{r, echo=FALSE}
-dist = dist(t(counts), method = "euclidean")
-hclust = hclust(dist)
-plot(hclust)
-```
 
 ### Heatmap van gefilterde en gesorteerde data
 ```{r, echo=FALSE}
