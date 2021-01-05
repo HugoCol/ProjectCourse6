@@ -6,9 +6,14 @@ output:
 
 Laden van libraries
 ```{r}
+browseVignettes("pathview")
+#if (!requireNamespace("BiocManager", quietly = TRUE))
+   # install.packages("BiocManager")
+
+#BiocManager::install("pathview")
 library(edgeR)
-library(xlsx)
-library(rtracklayer)
+#library(xlsx)
+#library(rtracklayer)
 library(KEGGREST)
 library(pathview)
 library(RCurl)

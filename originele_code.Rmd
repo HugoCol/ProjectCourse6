@@ -82,3 +82,44 @@ as.data.frame(do.call(cbind, my_list2))
 
 
 
+conflict
+
+=======
+### Cluster
+```{r}
+#by=(list(KM$cluster)FUN=mean)
+# append cluster assignment
+mydata <- data.frame(mydata, KM$cluster)
+#mydata
+```
+
+### FoldChange
+Er is nu een dataframe me de fold changes,
+uit de mydata moeten die genen met FC tussen 1 en -1 verwijderd worden
+en de foldchanges die blijven in een kolom toegevoegd worden
+```{r}
+mydata
+# Bereken het gemiddelde
+meanWCFSglu <- rowMeans(mydata[,1:2])
+meanWCFSrib <-rowMeans(mydata[,3:4])
+meanNC8glu <-rowMeans(mydata[,5:6])
+meanNC8rib <-rowMeans(mydata[,7:8])
+
+# bereken de foldchange tussen glu en rib
+WCFSfc <- foldchange(meanWCFSglu , meanWCFSrib )
+
+NC8fc <- foldchange(meanNC8glu , meanNC8rib )
+
+# hoe doe je nu he filteren? Di geef booleans
+
+my_list <- list(WCFSfc > 2, NC8fc > 2)
+>>>>>>> 5dd37dc927ffaa0baa856757dc452085e4bc3529
+
+
+
+
+<<<<<<< HEAD
+=======
+WCFS1_DEgenes <- subset(WCFSfclog, (logFC < -1 | logFC > 1))
+my_list2 <- list(WCFSfclog, NC8fclog)
+>>>>>>> 5dd37dc927ffaa0baa856757dc452085e4bc3529
