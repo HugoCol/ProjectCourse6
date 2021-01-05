@@ -1,0 +1,84 @@
+### Alle p-values
+```{r}
+PV <- fit[["table"]][["PValue"]]
+head(PV, 100)
+```
+### Grafiek om het aantal clusters te laten zien
+```{r}
+# wordt gebruikt om het aantal cluster weer te geven dat je moet gebruiken voor de K-means
+wssplot <- function(data, nc=15, seed=1234)
+{
+  wss <- (nrow(data)-1)*sum(apply(data, 2,var))
+  for (i in 2:nc){
+    set.seed(seed)
+    wss[i] <- sum(kmeans(data, centers=i)$withinss)}
+  plot(1:nc, wss, type='b', xlab = "number of clusters", 
+       ylab = "within groups sum of squares")
+}
+# Bij de waarde waar hij overloopt tot een rechte lijn moet je gebruiken voor aantal clusters.
+# Dus met deze gegevens wordt een cluster van 4 gebruikt
+mydata = select(data, c(2,3,4,5,6,7,8,9))
+wssplot(mydata)
+```
+
+
+
+### K-means berekenen.
+```{r}
+KM = kmeans(mydata, 4)
+autoplot(KM, mydata, frame=TRUE)
+```
+
+### Cluster
+```{r}
+by=list((KM$cluster),FUN=mean)
+# append cluster assignment
+mydata <- data.frame(mydata, KM$cluster)
+#mydata
+```
+
+### FoldChange
+Er is nu een dataframe me de fold changes,
+uit de mydata moeten die genen met FC tussen 1 en -1 verwijderd worden
+en de foldchanges die blijven in een kolom toegevoegd worden
+```{r}
+
+mydata
+# Bereken het gemiddelde
+meanWCFSglu <- rowMeans(mydata[,1:2])
+meanWCFSrib <-rowMeans(mydata[,3:4])
+meanNC8glu <-rowMeans(mydata[,5:6])
+meanNC8rib <-rowMeans(mydata[,7:8])
+
+# bereken de foldchange tussen glu en rib
+WCFSfc <- foldchange(meanWCFSglu , meanWCFSrib )
+test <- table[(WCFSfc > 2)]
+test
+NC8fc <- foldchange(meanNC8glu , meanNC8rib )
+
+# hoe doe je nu he filteren? Di geef booleans
+my_list <- list(WCFSfc > 2, NC8fc > 2)
+
+FoldchangeFrame <- data.frame(do.call(cbind, my_list))
+FoldchangeFrame
+#maak de FC Log2, code nog niet goed
+
+WCFSfclog <- foldchange2logratio(WCFSfc, base=2)
+
+NC8fclog <- foldchange2logratio(NC8fc, base=2)
+
+my_list2 <- list(WCFSfclog, NC8fclog)
+
+as.data.frame(do.call(cbind, my_list2))
+```
+
+
+
+
+
+
+
+
+
+
+
