@@ -24,32 +24,28 @@ require(ggfortify)
 require(dendextend)
 require(gtools)
 require(knitr)
+library(pathview)
 ```
 
 ```{r include=FALSE}
 # Data RNA-seq inlezen. 
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
-
 inhoud = read.table("./RNAseq-bestanden/RNA-Seq-counts.txt", header=TRUE)
 row.names(inhoud) = inhoud[,"ID"]
-
 group <- factor(c("WCFS1.glc",	"WCFS1.glc",	"WCFS1.rib"
                  , "WCFS1.rib", "NC8.glc", "NC8.glc"	
                  , "NC8.rib", "NC8.rib"))
 #x <- DGEList(counts=data[,2:9], group=group)
 x = DGEList(counts=inhoud[,2:9], group=group)
-
 # Normalisatiefactoren berekenen en low-read-counts wegfilteren,
 # nodig voor normalisatie en dispersie.
 x <- calcNormFactors(x, method="TMM" )
 keep <- filterByExpr(x)
 x <- x[keep, , keep.lib.sizes=FALSE]
 x$samples$lib.size = colSums(x$counts)
-
 # Design matrix maken, nodig voor dispersie bepalen.
 design <- model.matrix(~0+group, data=x$samples)
 colnames(design) <- levels(x$samples$group)
-
 # Dispersie bepalen.
 x <- estimateGLMCommonDisp(x,design)
 x <- estimateGLMTrendedDisp(x,design, method="power")
@@ -97,6 +93,15 @@ hclust = hclust(dist)
 plot(hclust)
 ```
 
+```{r, include=FALSE}
+# K-means berekenen en plotten. Plot fout?
+KM = kmeans(t(x$counts), 4)
+print(t(x$counts))
+
+autoplot(KM, t(x$counts), frame=TRUE)
+#plot(KM)
+```
+
 ```{r, include = FALSE}
 # LogFC, P-waarde en FDR berekenen en koppelen aan originele
 # data en annotatie toevoegen. Daarna data filteren op FDR<0.5
@@ -105,25 +110,26 @@ fit <- glmFit(x, design)
 mc <- makeContrasts(WCFS1.glc-WCFS1.rib, NC8.glc-NC8.rib, levels=design)
 fit = glmLRT(fit, contrast=mc)
 waardes = topTags(fit, dim(fit)[1])$table
-
 # LogFC, P-waarde en FDR koppelen aan genormaliseerde en
 # gefilterde data uit DGE-lijst.
 combinatie = merge(x$counts, waardes, by=0)
 names(combinatie)[names(combinatie) == "Row.names"] = "ORF"
-
 # Annotatie inlezen en koppelen aan data.
 annotatie = read.table("./RNAseq-bestanden/WCFS1_anno.txt", header=TRUE
                        , sep="\t", quote="")
 data = merge(combinatie, annotatie, by="ORF")
-
 # Data filteren en sorteren.
 data = subset(data, FDR < 0.05)
-data = subset(data, logFC.WCFS1.glc...WCFS1.rib >= -1)
-data = subset(data, logFC.WCFS1.glc...WCFS1.rib <= 1)
-data = subset(data, logFC.NC8.glc...NC8.rib >= -1)
-data = subset(data, logFC.NC8.glc...NC8.rib <= 1)
+# filteren uitzoeken
+
+data = subset(data, logFC.WCFS1.glc...WCFS1.rib <= -1 | logFC.WCFS1.glc...WCFS1.rib >= 1)
+              
+data = subset(data, logFC.NC8.glc...NC8.rib <= -1 |  logFC.NC8.glc...NC8.rib >= 1)
+
 data = data[order(data$FDR), ]
 counts = data[, 2:9]
+View(data)
+view(t(x$counts))
 ```
 
 ### Gegevens na filteren
@@ -131,26 +137,19 @@ Gebruikte filters:
   
 * FDR < 0.05
 * -1 < logFC < 1
-  
+
 Aantal genen na filteren: `r dim(data)[1]`
 
 ### Heatmap van gefilterde en gesorteerde data
 ```{r, echo=FALSE}
 heatmap(as.matrix(counts))
 ```
-
-```{r, include=FALSE}
-# K-means berekenen en plotten. Plot fout?
-KM = kmeans(counts, 4)
-autoplot(KM, counts, frame=TRUE)
+### Pathways
+Visualiseren van genen in de Glycolyse pathway van de significante WCFS1 genen
+```{r}
+mypathway <- "lpl00010"
+genes <- row.names(data$ORF)
+logFC <- data$logFC.WCFS1.glc...WCFS1.rib
+names(logFC) <- genes
+pathview(gene.data = logFC, species = "lpl", pathway = mypathway,  gene.idtype = "KEGG")
 ```
-
-
-
-
-
-
-
-
-
-
