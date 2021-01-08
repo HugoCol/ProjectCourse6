@@ -6,7 +6,7 @@ output:
 
 Laden van libraries
 ```{r}
-browseVignettes("pathview")
+#browseVignettes("pathview")
 #if (!requireNamespace("BiocManager", quietly = TRUE))
    # install.packages("BiocManager")
 
@@ -143,14 +143,14 @@ print(head(WCFS1_sig))
 
 Openen van gff bestand
 ```{r}
-gff <- import.gff3("L_plantarum_genomic.gff")
-print(gff)
+#gff <- import.gff3("L_plantarum_genomic.gff")
+#print(gff)
 ```
 
 Opslaan van data in bestanden
 ```{r}
-write.xlsx(WCFS1_sig, file = "Gen expressie Lacto. plantarum.xlsx", sheetName = "WCFS1 significant", append = T)
-write.xlsx(NC8_sig, file = "Gen expressie Lacto. plantarum.xlsx", sheetName = "NC8 significant", append = T)
+#write.xlsx(WCFS1_sig, file = "Gen expressie Lacto. plantarum.xlsx", sheetName = "WCFS1 significant", append = T)
+#write.xlsx(NC8_sig, file = "Gen expressie Lacto. plantarum.xlsx", sheetName = "NC8 significant", append = T)
 ```
 
 Ophalen van pathway's van KEGG
@@ -173,40 +173,40 @@ for(p in 1:24){
 }
 
 #fill data frame
-for(g in 1:length(alleData$ids)){
-  current_gene <- alleData$ids[g]
-  indexes <- which(grepl(current_gene, names(pathways)))
-  if(!length(indexes)==0){
-    for(x in 1:length(indexes)){
-        indexpathwaycode <- x+x
-        indexdesc <- x+x+1
-        pathwayname <- pathways[indexes[x]]
-        alleData[g,indexpathwaycode] <- pathwayname
-        alleData[g,indexdesc] <- getPathwayDesc(pathwayname)
-    }
-  }
-}
-write.xlsx(x = alleData, file = "genen_pathway.xlsx", showNA=FALSE)
-getwd()
+#for(g in 1:length(alleData$ids)){
+#  current_gene <- alleData$ids[g]
+#  indexes <- which(grepl(current_gene, names(pathways)))
+#  if(!length(indexes)==0){
+#    for(x in 1:length(indexes)){
+#        indexpathwaycode <- x+x
+#        indexdesc <- x+x+1
+#        pathwayname <- pathways[indexes[x]]
+#        alleData[g,indexpathwaycode] <- pathwayname
+#        alleData[g,indexdesc] <- getPathwayDesc(pathwayname)
+#    }
+#  }
+#}
+#write.xlsx(x = alleData, file = "genen_pathway.xlsx", showNA=FALSE)
+#getwd()
 ```
 
 Maken van een ranked bestand voor de GSEA
 ```{r}
-rnk_NC8 <- res_NC8
-rnk_WCFS1 <- res_WCFS1
+#rnk_NC8 <- res_NC8
+#rnk_WCFS1 <- res_WCFS1
 
-rnk_NC8$table$fcSign <- sign(rnk_NC8$table$logFC)
-rnk_NC8$table$logP <- -log10(rnk_NC8$table$PValue)
-rnk_NC8$table$metric <- rnk_NC8$table$logP/rnk_NC8$table$fcSign
-rnk_NC8$table$
-s <- rnk_NC8[,c("metric")]
-write.table(s, file="NC8_expression.rnk", quote=F, sep="\t", row.names = F)
+#rnk_NC8$table$fcSign <- sign(rnk_NC8$table$logFC)
+#rnk_NC8$table$logP <- -log10(rnk_NC8$table$PValue)
+#rnk_NC8$table$metric <- rnk_NC8$table$logP/rnk_NC8$table$fcSign
+#rnk_NC8$table$
+#s <- rnk_NC8[,c("metric")]
+#write.table(s, file="NC8_expression.rnk", quote=F, sep="\t", row.names = F)
 
-rnk_WCFS1$table$fcSign <- sign(rnk_WCFS1$table$logFC)
-rnk_WCFS1$table$logP <- -log10(rnk_WCFS1$table$PValue)
-rnk_WCFS1$table$metric <- rnk_WCFS1$table$logP/rnk_WCFS1$table$fcSign
-s <- rnk_WCFS1[,c("Name","metric")]
-write.table(s, file="WCFS1_expression.rnk", quote=F, sep="\t", row.names = F)
+#rnk_WCFS1$table$fcSign <- sign(rnk_WCFS1$table$logFC)
+#rnk_WCFS1$table$logP <- -log10(rnk_WCFS1$table$PValue)
+#rnk_WCFS1$table$metric <- rnk_WCFS1$table$logP/rnk_WCFS1$table$fcSign
+#s <- rnk_WCFS1[,c("Name","metric")]
+#write.table(s, file="WCFS1_expression.rnk", quote=F, sep="\t", row.names = F)
 
 ```
 
@@ -239,7 +239,6 @@ genes <- row.names(WCFS1_sig)
 logFC <- WCFS1_sig$logFC
 names(logFC) <- genes
 pathview(gene.data = logFC, species = "lpl", pathway = mypathway,  gene.idtype = "KEGG")
-
 ```
 
 
