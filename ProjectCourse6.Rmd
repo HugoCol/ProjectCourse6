@@ -32,24 +32,23 @@ library(pathview)
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 inhoud = read.table("./RNAseq-bestanden/RNA-Seq-counts.txt", header=TRUE)
 row.names(inhoud) = inhoud[,"ID"]
-group <- factor(c("WCFS1.glc",	"WCFS1.glc",	"WCFS1.rib"
+group = factor(c("WCFS1.glc",	"WCFS1.glc",	"WCFS1.rib"
                  , "WCFS1.rib", "NC8.glc", "NC8.glc"	
                  , "NC8.rib", "NC8.rib"))
-#x <- DGEList(counts=data[,2:9], group=group)
 x = DGEList(counts=inhoud[,2:9], group=group)
 # Normalisatiefactoren berekenen en low-read-counts wegfilteren,
 # nodig voor normalisatie en dispersie.
-x <- calcNormFactors(x, method="TMM" )
-keep <- filterByExpr(x)
-x <- x[keep, , keep.lib.sizes=FALSE]
+x = calcNormFactors(x, method="TMM" )
+keep = filterByExpr(x)
+x = x[keep, , keep.lib.sizes=FALSE]
 x$samples$lib.size = colSums(x$counts)
 # Design matrix maken, nodig voor dispersie bepalen.
-design <- model.matrix(~0+group, data=x$samples)
-colnames(design) <- levels(x$samples$group)
+design = model.matrix(~0+group, data=x$samples)
+colnames(design) = levels(x$samples$group)
 # Dispersie bepalen.
-x <- estimateGLMCommonDisp(x,design)
-x <- estimateGLMTrendedDisp(x,design, method="power")
-x <- estimateGLMTagwiseDisp(x,design)
+x = estimateGLMCommonDisp(x,design)
+x = estimateGLMTrendedDisp(x,design, method="power")
+x = estimateGLMTagwiseDisp(x,design)
 ```
 
 ### Samenvatting van genormaliseerde data
@@ -106,8 +105,8 @@ autoplot(KM, t(x$counts), frame=TRUE)
 # LogFC, P-waarde en FDR berekenen en koppelen aan originele
 # data en annotatie toevoegen. Daarna data filteren op FDR<0.5
 # en logFC tussen -1 en 1. Tenslotte data filteren op FDR.
-fit <- glmFit(x, design)
-mc <- makeContrasts(WCFS1.glc-WCFS1.rib, NC8.glc-NC8.rib, levels=design)
+fit = glmFit(x, design)
+mc = makeContrasts(WCFS1.glc-WCFS1.rib, NC8.glc-NC8.rib, levels=design)
 fit = glmLRT(fit, contrast=mc)
 waardes = topTags(fit, dim(fit)[1])$table
 # LogFC, P-waarde en FDR koppelen aan genormaliseerde en
@@ -157,30 +156,3 @@ pathview(gene.data=logFC, species="lpl", pathway="lpl00010"
 pathview(gene.data=logFC, species="lpl", pathway="lpl00030"
          , gene.idtype="KEGG", out.suffix="NC8-gefilterd")
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
