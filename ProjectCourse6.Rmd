@@ -119,17 +119,12 @@ annotatie = read.table("./RNAseq-bestanden/WCFS1_anno.txt", header=TRUE
                        , sep="\t", quote="")
 data = merge(combinatie, annotatie, by="ORF")
 # Data filteren en sorteren.
-data = subset(data, FDR < 0.05)
-# filteren uitzoeken
-
-data = subset(data, logFC.WCFS1.glc...WCFS1.rib <= -1 | logFC.WCFS1.glc...WCFS1.rib >= 1)
-              
-data = subset(data, logFC.NC8.glc...NC8.rib <= -1 |  logFC.NC8.glc...NC8.rib >= 1)
-
-data = data[order(data$FDR), ]
-counts = data[, 2:9]
-View(data)
-view(t(x$counts))
+gefilterd = subset(data, FDR < 0.05)
+gefilterd = subset(gefilterd, logFC.WCFS1.glc...WCFS1.rib <= -1 |
+                logFC.WCFS1.glc...WCFS1.rib >= 1)
+gefilterd = subset(gefilterd, logFC.NC8.glc...NC8.rib <= -1 |
+                logFC.NC8.glc...NC8.rib >= 1)
+counts = gefilterd[, 2:9]
 ```
 
 ### Gegevens na filteren
@@ -138,18 +133,54 @@ Gebruikte filters:
 * FDR < 0.05
 * -1 < logFC < 1
 
-Aantal genen na filteren: `r dim(data)[1]`
+Aantal significante genen na filteren: `r dim(gefilterd)[1]`
 
 ### Heatmap van gefilterde en gesorteerde data
 ```{r, echo=FALSE}
 heatmap(as.matrix(counts))
 ```
+
 ### Pathways
-Visualiseren van genen in de Glycolyse pathway van de significante WCFS1 genen
 ```{r}
-mypathway <- "lpl00010"
-genes <- row.names(data$ORF)
-logFC <- data$logFC.WCFS1.glc...WCFS1.rib
-names(logFC) <- genes
-pathview(gene.data = logFC, species = "lpl", pathway = mypathway,  gene.idtype = "KEGG")
+logFC = gefilterd$logFC.WCFS1.glc...WCFS1.rib
+names(logFC) = gefilterd$ORF
+pathview(gene.data=logFC, species="lpl", pathway="lpl00010"
+         , gene.idtype="KEGG", out.suffix="WCFS1-gefilterd")
+pathview(gene.data=logFC, species="lpl", pathway="lpl00030"
+         , gene.idtype="KEGG", out.suffix="WCFS1-gefilterd")
 ```
+```{r}
+logFC = gefilterd$logFC.NC8.glc...NC8.rib
+names(logFC) = gefilterd$ORF
+pathview(gene.data=logFC, species="lpl", pathway="lpl00010"
+         , gene.idtype="KEGG", out.suffix="NC8-gefilterd")
+pathview(gene.data=logFC, species="lpl", pathway="lpl00030"
+         , gene.idtype="KEGG", out.suffix="NC8-gefilterd")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
