@@ -16,13 +16,13 @@ Met een klein beetje CSS, in het HTML Markdown de kolommen verkorten
 
 ```{r packagesLaden, include = FALSE}
 require(edgeR)
-require(limma)
-require(stats)
-require(dplyr)
+#require(limma)
+#require(stats)
+#require(dplyr)
 require(ggplot2)
-require(ggfortify)
-require(dendextend)
-require(gtools)
+#require(ggfortify)
+#require(dendextend)
+#require(gtools)
 require(knitr)
 library(pathview)
 ```
