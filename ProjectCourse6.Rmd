@@ -9,9 +9,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## R Markdown
 Dit is een R Markdown document voor het project van course 6 gemaakt door 
-groep 1. blablabla (╯°□°）╯︵ ┻━┻
-
-Met een klein beetje CSS, in het HTML Markdown de kolommen verkorten
+groep 1. Max Nollet, Yorick Cleijssen en Hugo Colenbrander
 
 
 ```{r packagesLaden, include = FALSE}
