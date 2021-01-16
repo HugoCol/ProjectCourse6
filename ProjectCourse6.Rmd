@@ -62,8 +62,8 @@ kable(x$samples)
 ```
 ### Plots van genormaliseerde data
 ```{r plotsWeergeven, echo=FALSE}
-plotMDS(x)
-plotBCV(x)
+plotMDS(x, main="PCA plot van WCFS1 en NC8")
+plotBCV(x, main="BCV plot van WCFS1 en NC8")
 ```
 
 ### Correlatie van de data
@@ -136,7 +136,7 @@ Aantal significante genen na filteren: `r dim(gefilterd)[1]`
 
 ### Heatmap van gefilterde en gesorteerde data
 ```{r, echo=FALSE}
-heatmap(as.matrix(counts))
+heatmap(as.matrix(counts), main="Heatmap van glucose en ribose van WCFS1 en NC8")
 ```
 
 ### Pathways
