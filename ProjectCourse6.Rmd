@@ -15,12 +15,7 @@ groep 1. Max Nollet, Yorick Cleijssen en Hugo Colenbrander
 ```{r packagesLaden, include = FALSE}
 require(edgeR)
 require(limma)
-#require(stats)
-#require(dplyr)
 require(ggplot2)
-#require(ggfortify)
-#require(dendextend)
-#require(gtools)
 require(knitr)
 library(pathview)
 ```
